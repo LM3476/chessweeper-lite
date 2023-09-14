@@ -7,9 +7,12 @@ This file contains the gameplay class, which is responsible for managing the cor
 The class will generate a specific configuration of mines, and will keep track of the game state.
 """
 class Gameplay:
-    def __init__(self) -> None:
+    def __init__(self, chessboard: Chessboard) -> None:
+        self.chessboard = chessboard
         self.board_tracker = self.initialise_board_tracker()
         self.mines = self.generate_mines()
+        for mine in self.mines:
+            chessboard.add_piece(*mine)
         self.remaining_mines = self.mines.copy()
         self.turns_taken = 0
         print(self.mines)
@@ -31,18 +34,19 @@ class Gameplay:
             coords.append((row, col))
         return [(row, col, random.choice(Piece.piece_list())) for row, col in coords]
     
-    def check_square(self, chessboard: Chessboard, row: int, col: int) -> None:
+    def check_square(self, row: int, col: int) -> None:
         """Checks the square at (row, col)."""
         if self.board_tracker[row][col] >= Status.CHECKED:
             # The square has already been checked.
             return
         else:
             self.turns_taken += 1
-            if chessboard.board[row][col] in Piece.piece_list():
+            if self.chessboard.board[row][col] in Piece.piece_list():
                 self.board_tracker[row][col] = Status.MINE
                 for mine in self.remaining_mines:
                     if (mine[0], mine[1]) == (row, col):
                         self.remaining_mines.remove(mine)
+                        self.chessboard.add_piece(*mine, remove=True)
                         break
                 print("Remaining mines: ", self.remaining_mines)
                 if len(self.remaining_mines) == 0:
