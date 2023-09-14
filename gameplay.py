@@ -15,7 +15,7 @@ class Gameplay:
             chessboard.add_piece(*mine)
         self.remaining_mines = self.mines.copy()
         self.turns_taken = 0
-        print(self.mines)
+        # print(self.mines)
    
     def initialise_board_tracker(self):
         # Initialise array to track whether a square has been clicked or not.
@@ -48,7 +48,7 @@ class Gameplay:
                         self.remaining_mines.remove(mine)
                         self.chessboard.add_piece(*mine, remove=True)
                         break
-                print("Remaining mines: ", self.remaining_mines)
+                # print("Remaining mines: ", self.remaining_mines)
                 if len(self.remaining_mines) == 0:
                     print("You win!")
                     print("Turns taken: ", self.turns_taken)

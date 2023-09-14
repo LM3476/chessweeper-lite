@@ -5,6 +5,7 @@ from gameplay import Gameplay, Status
 
 # Initialize Pygame
 pygame.init()
+random.seed(1)
 
 # Define square size and margin
 SQUARE_SIZE = 50
