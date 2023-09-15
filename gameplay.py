@@ -1,6 +1,8 @@
 from typing import List, Tuple
 import random
-from initialise_board import Chessboard, Piece
+from initialise_board import Chessboard
+from pieces import Piece
+from globals import BOARD_DIMENSION, MIN_MINES, MAX_MINES
 
 """
 This file contains the gameplay class, which is responsible for managing the core gameplay of Chessweeper.
@@ -19,17 +21,17 @@ class Gameplay:
    
     def initialise_board_tracker(self):
         # Initialise array to track whether a square has been clicked or not.
-        return [[0 for _ in range(8)] for _ in range(8)]
+        return [[0 for _ in range(BOARD_DIMENSION)] for _ in range(BOARD_DIMENSION)]
     
     def generate_mines(self) -> List[Tuple[int, int]]:
         """Generates a random configuration of mines on the chessboard."""
         coords = []
         #We generate between 2-5 different pieces
-        for _ in range(random.randint(2, 5)):
+        for _ in range(random.randint(MIN_MINES, MAX_MINES)):
             #We generate a random position
-            row, col = random.randint(0, 7), random.randint(0, 7)
+            row, col = random.randint(0, BOARD_DIMENSION-1), random.randint(0, BOARD_DIMENSION-1)
             while (row, col) in coords:
-                row, col = random.randint(0, 7), random.randint(0, 7)
+                row, col = random.randint(0, BOARD_DIMENSION-1), random.randint(0, BOARD_DIMENSION-1)
             #We add the piece to the position
             coords.append((row, col))
         return [(row, col, random.choice(Piece.piece_list())) for row, col in coords]
@@ -54,7 +56,17 @@ class Gameplay:
                     print("Turns taken: ", self.turns_taken)
                     return "win"
             else:
+                self.clear_adjacent_empty_squares(row, col)
                 self.board_tracker[row][col] = Status.CHECKED
+    
+    def clear_adjacent_empty_squares(self, row: int, col: int) -> None:
+        """Clears all adjacent empty squares to the square at (row, col)."""
+        if self.chessboard.is_valid_square(row, col) and self.chessboard.board[row][col] == 0 and self.board_tracker[row][col] < Status.CHECKED:
+            self.board_tracker[row][col] = Status.CHECKED
+            self.clear_adjacent_empty_squares(row - 1, col)
+            self.clear_adjacent_empty_squares(row + 1, col)
+            self.clear_adjacent_empty_squares(row, col - 1)
+            self.clear_adjacent_empty_squares(row, col + 1)
 
 class Status:
     UNCHECKED = 0

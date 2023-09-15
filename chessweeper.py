@@ -1,28 +1,25 @@
 import pygame
 import random
-from initialise_board import Chessboard, Piece
+from initialise_board import Chessboard
+from pieces import Piece
 from gameplay import Gameplay, Status
 from flag import Flag
+from globals import BOARD_DIMENSION, SQUARE_SIZE, MARGIN, TOP_MARGIN
 
 # Initialize Pygame
 pygame.init()
 random.seed()
 
-# Define square size and margin
-SQUARE_SIZE = 50
-MARGIN = 0
-TOP_MARGIN = 100
-
 # Set up the game board
-screen = pygame.display.set_mode((8*SQUARE_SIZE, 8*SQUARE_SIZE + TOP_MARGIN))
+screen = pygame.display.set_mode((BOARD_DIMENSION*SQUARE_SIZE, BOARD_DIMENSION*SQUARE_SIZE + TOP_MARGIN))
 pygame.display.set_caption("Chess Minesweeper")
 
 # Define chessboard colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
-# Create an 8x8 grid of squares with alternating colors
-board_color = [[(BLACK if (i + j) % 2 == 0 else WHITE) for j in range(8)] for i in range(8)]
+# Create an BOARD_DIMENSIONxBOARD_DIMENSION grid of squares with alternating colors
+board_color = [[(BLACK if (i + j) % 2 == 0 else WHITE) for j in range(BOARD_DIMENSION)] for i in range(BOARD_DIMENSION)]
 
 # Initialise chessboard and gameplay classes
 chessboard = Chessboard()
@@ -58,19 +55,20 @@ while running:
             elif event.button == 2:
                 flag.clear_flags()
 
-    #Draw the pieces 
+    #Draw the pieces that need to be found 
     for i in range(len(gameplay.mines)):
-        x = (SQUARE_SIZE + MARGIN + SQUARE_SIZE/2) * i + SQUARE_SIZE/2
-        y = SQUARE_SIZE/2
-        pygame.draw.rect(screen, (255,0,0), [x, y, SQUARE_SIZE, SQUARE_SIZE])
+        square_size = min(BOARD_DIMENSION*SQUARE_SIZE/(3*len(gameplay.mines)+1)*2, SQUARE_SIZE)
+        x = (square_size + MARGIN + square_size/2) * i + square_size/2
+        y = square_size/2
+        pygame.draw.rect(screen, (255,0,0), [x, y, square_size, square_size])
         if i < len(gameplay.remaining_mines):
             text = font.render(str(gameplay.remaining_mines[i][2]), True, (0, 0, 0))
-            text_rect = text.get_rect(center=(x + SQUARE_SIZE/2, y + SQUARE_SIZE/2))
+            text_rect = text.get_rect(center=(x + square_size/2, y + square_size/2))
         screen.blit(text, text_rect)
 
     # Draw the chessboard and numbers/kings
-    for row in range(8):
-        for col in range(8):
+    for row in range(BOARD_DIMENSION):
+        for col in range(BOARD_DIMENSION):
             color = board_color[row][col]
             #Draw the squares
             pygame.draw.rect(screen, color, [(SQUARE_SIZE + MARGIN) * col, (SQUARE_SIZE + MARGIN) * row + TOP_MARGIN, SQUARE_SIZE, SQUARE_SIZE])

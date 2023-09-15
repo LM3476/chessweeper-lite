@@ -1,4 +1,5 @@
-from initialise_board import Chessboard, Piece
+from initialise_board import Chessboard
+from pieces import Piece
 """
 Class for implementing simple flagging functionality.
 """
