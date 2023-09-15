@@ -2,10 +2,11 @@ import pygame
 import random
 from initialise_board import Chessboard, Piece
 from gameplay import Gameplay, Status
+from flag import Flag
 
 # Initialize Pygame
 pygame.init()
-random.seed(1)
+random.seed()
 
 # Define square size and margin
 SQUARE_SIZE = 50
@@ -29,6 +30,9 @@ chessboard = Chessboard()
 # Gameplay class contains all the game logic
 gameplay = Gameplay(chessboard)
 
+# Flag class contains all the flagging logic
+flag = Flag()
+
 # Set up fonts for displaying numbers
 font = pygame.font.Font(None, 36)
 
@@ -45,9 +49,14 @@ while running:
             col, row = x // (SQUARE_SIZE + MARGIN), (y-TOP_MARGIN) // (SQUARE_SIZE + MARGIN)
             print("Click ", x, y, "Grid coordinates: ", row, col)
             # Check the square at (row, col)
-            if gameplay.check_square(row, col) == "win":
-                running = False
-            print(chessboard.board[row][col])
+            if event.button == 1:
+                if gameplay.check_square(row, col) == "win":
+                    running = False
+                print(chessboard.board[row][col])
+            elif event.button == 3:
+                flag.flag_square(row, col)
+            elif event.button == 2:
+                flag.clear_flags()
 
     #Draw the pieces 
     for i in range(len(gameplay.mines)):
@@ -58,15 +67,24 @@ while running:
             text = font.render(str(gameplay.remaining_mines[i][2]), True, (0, 0, 0))
             text_rect = text.get_rect(center=(x + SQUARE_SIZE/2, y + SQUARE_SIZE/2))
         screen.blit(text, text_rect)
+
     # Draw the chessboard and numbers/kings
     for row in range(8):
         for col in range(8):
             color = board_color[row][col]
+            #Draw the squares
             pygame.draw.rect(screen, color, [(SQUARE_SIZE + MARGIN) * col, (SQUARE_SIZE + MARGIN) * row + TOP_MARGIN, SQUARE_SIZE, SQUARE_SIZE])
+            #Draw the revealed squares
             text = font.render(str(chessboard.board[row][col]), True, (255, 0, 0))
             text_rect = text.get_rect(center=((SQUARE_SIZE + MARGIN) * col + SQUARE_SIZE // 2, (SQUARE_SIZE + MARGIN) * row + SQUARE_SIZE // 2 + TOP_MARGIN))
             if(gameplay.board_tracker[row][col] >= Status.CHECKED):
                 screen.blit(text, text_rect)
+            #Draw the flags
+            small_font = pygame.font.Font(None, 24)  # Change the font size as needed
+            text = small_font.render(str(flag.flagged.board[row][col]), True, (255, 0, 0))
+            if flag.flagged.board[row][col] is not 0:
+                screen.blit(text, ((SQUARE_SIZE + MARGIN) * col + MARGIN,(SQUARE_SIZE + MARGIN) * row + MARGIN + TOP_MARGIN))
+
 
     pygame.display.update()
 
