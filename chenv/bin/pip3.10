@@ -1,4 +1,4 @@
-#!/home/lachlan/projects/chessweeper-lite/chenv/bin/python3
+#!/home/lachlan/projects/chessweeper-lite/chenv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

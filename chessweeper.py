@@ -4,11 +4,11 @@ from initialise_board import Chessboard
 from pieces import Piece
 from gameplay import Gameplay, Status
 from flag import Flag
-from globals import BOARD_DIMENSION, SQUARE_SIZE, MARGIN, TOP_MARGIN
+from globals import BOARD_DIMENSION, SQUARE_SIZE, MARGIN, TOP_MARGIN, SEED
 
 # Initialize Pygame
 pygame.init()
-random.seed()
+random.seed(SEED)
 
 # Set up the game board
 screen = pygame.display.set_mode((BOARD_DIMENSION*SQUARE_SIZE, BOARD_DIMENSION*SQUARE_SIZE + TOP_MARGIN))
@@ -20,6 +20,12 @@ WHITE = (255, 255, 255)
 
 # Create an BOARD_DIMENSIONxBOARD_DIMENSION grid of squares with alternating colors
 board_color = [[(BLACK if (i + j) % 2 == 0 else WHITE) for j in range(BOARD_DIMENSION)] for i in range(BOARD_DIMENSION)]
+
+#Load and resize images
+image_dict = {}
+for piece in Piece.piece_list():
+    image_dict[piece] = pygame.image.load("images/"+piece + ".png")
+    image_dict[piece] = pygame.transform.scale(image_dict[piece], (SQUARE_SIZE, SQUARE_SIZE))
 
 # Initialise chessboard and gameplay classes
 chessboard = Chessboard()
@@ -82,7 +88,13 @@ while running:
             text = small_font.render(str(flag.flagged.board[row][col]), True, (255, 0, 0))
             if flag.flagged.board[row][col] is not 0:
                 screen.blit(text, ((SQUARE_SIZE + MARGIN) * col + MARGIN,(SQUARE_SIZE + MARGIN) * row + MARGIN + TOP_MARGIN))
-
+    #Draw the revealed mines
+    for row, col, piece in gameplay.revealed_mines:
+        combined_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE),pygame.SRCALPHA)
+        combined_surface.blit(image_dict[piece], (0, 0))
+        text_surface = font.render(str(chessboard.board[row][col]), True, (255, 0, 0))
+        combined_surface.blit(text_surface, ((SQUARE_SIZE-text_surface.get_width())//2, (SQUARE_SIZE-text_surface.get_height())//2))
+        screen.blit(combined_surface, ((SQUARE_SIZE + MARGIN) * col, (SQUARE_SIZE + MARGIN) * row + TOP_MARGIN))
 
     pygame.display.update()
 
